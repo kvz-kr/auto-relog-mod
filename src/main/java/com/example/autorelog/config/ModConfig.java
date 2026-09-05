@@ -6,4 +6,6 @@ public class ModConfig {
     public boolean enabled = true;
     public double yThreshold = -5.0;
     public boolean autoReconnect = true;
+    public boolean isReconnecting = false;
+    public boolean shouldLookUpOnJoin = false;
 }
