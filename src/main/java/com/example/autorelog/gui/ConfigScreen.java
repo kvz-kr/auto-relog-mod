@@ -3,7 +3,6 @@ package com.example.autorelog.gui;
 import com.example.autorelog.ModConfig;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.OptionListWidget;
 import net.minecraft.text.Text;
 
 public class ConfigScreen extends Screen {
@@ -16,20 +15,33 @@ public class ConfigScreen extends Screen {
 
     @Override
     protected void init() {
+        // Toggle Enabled
         this.addDrawableChild(ButtonWidget.builder(
             Text.literal("Enabled: " + ModConfig.INSTANCE.enabled),
             button -> {
                 ModConfig.INSTANCE.enabled = !ModConfig.INSTANCE.enabled;
                 button.setMessage(Text.literal("Enabled: " + ModConfig.INSTANCE.enabled));
             })
-            .dimensions(this.width / 2 - 100, this.height / 2 - 20, 200, 20)
+            .dimensions(this.width / 2 - 100, this.height / 2 - 45, 200, 20)
             .build()
         );
 
+        // Auto Equip Slot Button (Cycles 1 - 9)
+        this.addDrawableChild(ButtonWidget.builder(
+            Text.literal("Auto Equip Slot: " + (ModConfig.INSTANCE.selectedSlot + 1)),
+            button -> {
+                ModConfig.INSTANCE.selectedSlot = (ModConfig.INSTANCE.selectedSlot + 1) % 9;
+                button.setMessage(Text.literal("Auto Equip Slot: " + (ModConfig.INSTANCE.selectedSlot + 1)));
+            })
+            .dimensions(this.width / 2 - 100, this.height / 2 - 15, 200, 20)
+            .build()
+        );
+
+        // Done Button
         this.addDrawableChild(ButtonWidget.builder(
             Text.literal("Done"),
             button -> this.client.setScreen(this.parent))
-            .dimensions(this.width / 2 - 100, this.height / 2 + 20, 200, 20)
+            .dimensions(this.width / 2 - 100, this.height / 2 + 25, 200, 20)
             .build()
         );
     }
