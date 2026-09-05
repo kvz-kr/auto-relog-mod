@@ -5,5 +5,5 @@ public class ModConfig {
 
     public boolean enabled = true;
     public double yThreshold = -5.0;
-    public boolean reconnecting = false;
+    public boolean autoReconnect = true;
 }
