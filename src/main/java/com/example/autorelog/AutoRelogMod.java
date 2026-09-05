@@ -29,6 +29,7 @@ public class AutoRelogMod implements ClientModInitializer {
     private boolean hasArmed = false;
     private ServerInfo lastServer = null;
     private int lookUpTicksRemaining = 0;
+    private int reconnectTicksRemaining = 0;
 
     @Override
     public void onInitializeClient() {
@@ -48,21 +49,31 @@ public class AutoRelogMod implements ClientModInitializer {
                     && client.currentScreen instanceof DisconnectedScreen 
                     && lastServer != null) {
                     
-                    ModConfig.INSTANCE.isReconnecting = true;
-                    ModConfig.INSTANCE.shouldChangeSlotOnJoin = true;
-                    lookUpTicksRemaining = 10;
+                    // Set delay to 3 ticks (~150ms) to bypass rate limits cleanly
+                    if (reconnectTicksRemaining <= 0) {
+                        reconnectTicksRemaining = 3; 
+                    }
 
-                    ServerInfo targetServer = lastServer;
-                    client.execute(() -> {
-                        ConnectScreen.connect(new TitleScreen(), client, ServerAddress.parse(targetServer.address), targetServer, false, null);
-                    });
+                    if (reconnectTicksRemaining > 0) {
+                        reconnectTicksRemaining--;
+                        if (reconnectTicksRemaining == 0) {
+                            ModConfig.INSTANCE.isReconnecting = true;
+                            ModConfig.INSTANCE.shouldChangeSlotOnJoin = true;
+                            lookUpTicksRemaining = 10;
+
+                            ServerInfo targetServer = lastServer;
+                            client.execute(() -> {
+                                ConnectScreen.connect(new TitleScreen(), client, ServerAddress.parse(targetServer.address), targetServer, false, null);
+                            });
+                        }
+                    }
                 }
                 return;
             }
 
+            reconnectTicksRemaining = 0;
             ModConfig.INSTANCE.isReconnecting = false;
 
-            // Auto Equip Hotbar Slot on Join
             if (ModConfig.INSTANCE.shouldChangeSlotOnJoin) {
                 int targetSlot = ModConfig.INSTANCE.selectedSlot;
                 
@@ -74,7 +85,6 @@ public class AutoRelogMod implements ClientModInitializer {
                 ModConfig.INSTANCE.shouldChangeSlotOnJoin = false;
             }
 
-            // Force pitch up and sync with server
             if (lookUpTicksRemaining > 0) {
                 client.player.setPitch(-90.0F);
 
