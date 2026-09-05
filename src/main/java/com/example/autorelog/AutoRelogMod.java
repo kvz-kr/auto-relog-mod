@@ -62,7 +62,7 @@ public class AutoRelogMod implements ClientModInitializer {
 
             ModConfig.INSTANCE.isReconnecting = false;
 
-            // Auto Equip Hotbar Slot on Join using public setter
+            // Auto Equip Hotbar Slot on Join
             if (ModConfig.INSTANCE.shouldChangeSlotOnJoin) {
                 int targetSlot = ModConfig.INSTANCE.selectedSlot;
                 
@@ -74,10 +74,9 @@ public class AutoRelogMod implements ClientModInitializer {
                 ModConfig.INSTANCE.shouldChangeSlotOnJoin = false;
             }
 
-            // Force pitch up and sync with server using PlayerMoveC2SPacket.Full
+            // Force pitch up and sync with server
             if (lookUpTicksRemaining > 0) {
                 client.player.setPitch(-90.0F);
-                client.player.prevPitch = -90.0F;
 
                 if (client.getNetworkHandler() != null) {
                     client.getNetworkHandler().sendPacket(
