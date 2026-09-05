@@ -15,7 +15,6 @@ public class ConfigScreen extends Screen {
 
     @Override
     protected void init() {
-        // Toggle Enabled
         this.addDrawableChild(ButtonWidget.builder(
             Text.literal("Enabled: " + ModConfig.INSTANCE.enabled),
             button -> {
@@ -26,7 +25,6 @@ public class ConfigScreen extends Screen {
             .build()
         );
 
-        // Auto Equip Slot Button (Cycles 1 - 9)
         this.addDrawableChild(ButtonWidget.builder(
             Text.literal("Auto Equip Slot: " + (ModConfig.INSTANCE.selectedSlot + 1)),
             button -> {
@@ -37,7 +35,6 @@ public class ConfigScreen extends Screen {
             .build()
         );
 
-        // Done Button
         this.addDrawableChild(ButtonWidget.builder(
             Text.literal("Done"),
             button -> this.client.setScreen(this.parent))
