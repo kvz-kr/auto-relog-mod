@@ -64,7 +64,7 @@ public class AutoRelogMod implements ClientModInitializer {
 
             // Auto Equip Hotbar Slot & Look Up on Join
             if (ModConfig.INSTANCE.shouldChangeSlotOnJoin) {
-                client.player.getInventory().setSelectedSlot(ModConfig.INSTANCE.selectedSlot);
+                client.player.getInventory().selectedSlot = ModConfig.INSTANCE.selectedSlot;
                 if (client.getNetworkHandler() != null) {
                     client.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(ModConfig.INSTANCE.selectedSlot));
                 }
