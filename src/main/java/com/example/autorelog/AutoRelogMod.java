@@ -12,6 +12,7 @@ import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
@@ -26,6 +27,7 @@ public class AutoRelogMod implements ClientModInitializer {
     
     private boolean hasArmed = false;
     private ServerInfo lastServer = null;
+    private int lookUpTicksRemaining = 0;
 
     @Override
     public void onInitializeClient() {
@@ -37,18 +39,17 @@ public class AutoRelogMod implements ClientModInitializer {
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            // Handle Disconnected State
+            // State: Disconnected / Not in world
             if (client.player == null || client.world == null) {
                 hasArmed = false;
 
-                // Fire auto-reconnect ONLY ONCE per disconnect event
                 if (ModConfig.INSTANCE.autoReconnect 
                     && !ModConfig.INSTANCE.isReconnecting 
                     && client.currentScreen instanceof DisconnectedScreen 
                     && lastServer != null) {
                     
                     ModConfig.INSTANCE.isReconnecting = true;
-                    ModConfig.INSTANCE.shouldLookUpOnJoin = true;
+                    lookUpTicksRemaining = 10; // Keep pitch forced up for 10 ticks after spawn
 
                     ServerInfo targetServer = lastServer;
                     client.execute(() -> {
@@ -58,40 +59,49 @@ public class AutoRelogMod implements ClientModInitializer {
                 return;
             }
 
-            // Player is in-game: reset reconnecting state
+            // State: In-game
             ModConfig.INSTANCE.isReconnecting = false;
 
-            // Apply auto-look up if returning from a relog
-            if (ModConfig.INSTANCE.shouldLookUpOnJoin) {
+            // Force pitch to -90 and sync with server for initial spawn ticks
+            if (lookUpTicksRemaining > 0) {
                 client.player.setPitch(-90.0F);
-                ModConfig.INSTANCE.shouldLookUpOnJoin = false;
+                client.player.prevPitch = -90.0F;
+
+                if (client.getNetworkHandler() != null) {
+                    client.getNetworkHandler().sendPacket(
+                        new PlayerMoveC2SPacket.LookAndOnGround(
+                            client.player.getYaw(), 
+                            -90.0F, 
+                            client.player.isOnGround(), 
+                            client.player.horizontalCollision
+                        )
+                    );
+                }
+                lookUpTicksRemaining--;
             }
 
-            // Save active server details
+            // Store active server entry
             if (client.getCurrentServerEntry() != null) {
                 lastServer = client.getCurrentServerEntry();
             }
 
-            // Open config menu via keybind
+            // Keybind listener
             while (configKeyBinding.wasPressed()) {
                 client.setScreen(new ConfigScreen(client.currentScreen));
             }
 
-            // Threshold logic
+            // Relog Threshold Check
             if (ModConfig.INSTANCE.enabled) {
                 double currentY = client.player.getY();
 
-                // Arm trigger when safely above threshold
                 if (currentY > ModConfig.INSTANCE.yThreshold) {
                     hasArmed = true;
                 } 
-                // Disconnect when falling below threshold
                 else if (currentY <= ModConfig.INSTANCE.yThreshold && hasArmed) {
                     hasArmed = false;
-
-                    // Instantly snap player pitch straight up
+                    
+                    // Snap pitch up immediately prior to disconnect packet
                     client.player.setPitch(-90.0F);
-
                     triggerRelog(client);
                 }
             }
