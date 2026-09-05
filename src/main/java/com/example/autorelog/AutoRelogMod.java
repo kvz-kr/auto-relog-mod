@@ -62,12 +62,11 @@ public class AutoRelogMod implements ClientModInitializer {
 
             ModConfig.INSTANCE.isReconnecting = false;
 
-            // Auto Equip Hotbar Slot on Join
+            // Auto Equip Hotbar Slot on Join using public setter
             if (ModConfig.INSTANCE.shouldChangeSlotOnJoin) {
                 int targetSlot = ModConfig.INSTANCE.selectedSlot;
                 
-                // Update client inventory selection without direct field access
-                client.player.getInventory().selectedSlot = targetSlot;
+                client.player.getInventory().setSelectedSlot(targetSlot);
                 
                 if (client.getNetworkHandler() != null) {
                     client.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(targetSlot));
@@ -75,17 +74,20 @@ public class AutoRelogMod implements ClientModInitializer {
                 ModConfig.INSTANCE.shouldChangeSlotOnJoin = false;
             }
 
-            // Force look straight up
+            // Force pitch up and sync with server using PlayerMoveC2SPacket.Full
             if (lookUpTicksRemaining > 0) {
                 client.player.setPitch(-90.0F);
                 client.player.prevPitch = -90.0F;
 
                 if (client.getNetworkHandler() != null) {
                     client.getNetworkHandler().sendPacket(
-                        new PlayerMoveC2SPacket.LookAndOnGround(
-                            client.player.getYaw(), 
-                            -90.0F, 
-                            client.player.isOnGround(), 
+                        new PlayerMoveC2SPacket.Full(
+                            client.player.getX(),
+                            client.player.getY(),
+                            client.player.getZ(),
+                            client.player.getYaw(),
+                            -90.0F,
+                            client.player.isOnGround(),
                             client.player.horizontalCollision
                         )
                     );
