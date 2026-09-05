@@ -2,9 +2,8 @@
   "required": true,
   "package": "com.example.autorelog.mixin",
   "compatibilityLevel": "JAVA_21",
-  "client": [
-    "ClientPlayNetworkHandlerMixin"
-  ],
+  "mixins": [],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   }
