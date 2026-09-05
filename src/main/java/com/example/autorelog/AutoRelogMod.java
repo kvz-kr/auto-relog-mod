@@ -37,11 +37,19 @@ public class AutoRelogMod implements ClientModInitializer {
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            // Handle Disconnected State
             if (client.player == null || client.world == null) {
                 hasArmed = false;
 
-                // Handle 0-delay Auto Reconnect if sitting on a Disconnect Screen
-                if (ModConfig.INSTANCE.autoReconnect && client.currentScreen instanceof DisconnectedScreen && lastServer != null) {
+                // Fire auto-reconnect ONLY ONCE per disconnect event
+                if (ModConfig.INSTANCE.autoReconnect 
+                    && !ModConfig.INSTANCE.isReconnecting 
+                    && client.currentScreen instanceof DisconnectedScreen 
+                    && lastServer != null) {
+                    
+                    ModConfig.INSTANCE.isReconnecting = true;
+                    ModConfig.INSTANCE.shouldLookUpOnJoin = true;
+
                     ServerInfo targetServer = lastServer;
                     client.execute(() -> {
                         ConnectScreen.connect(new TitleScreen(), client, ServerAddress.parse(targetServer.address), targetServer, false, null);
@@ -50,7 +58,16 @@ public class AutoRelogMod implements ClientModInitializer {
                 return;
             }
 
-            // Save active server details for reconnecting
+            // Player is in-game: reset reconnecting state
+            ModConfig.INSTANCE.isReconnecting = false;
+
+            // Apply auto-look up if returning from a relog
+            if (ModConfig.INSTANCE.shouldLookUpOnJoin) {
+                client.player.setPitch(-90.0F);
+                ModConfig.INSTANCE.shouldLookUpOnJoin = false;
+            }
+
+            // Save active server details
             if (client.getCurrentServerEntry() != null) {
                 lastServer = client.getCurrentServerEntry();
             }
@@ -60,20 +77,19 @@ public class AutoRelogMod implements ClientModInitializer {
                 client.setScreen(new ConfigScreen(client.currentScreen));
             }
 
+            // Threshold logic
             if (ModConfig.INSTANCE.enabled) {
                 double currentY = client.player.getY();
 
-                // 1. Arm only once player is above threshold
+                // Arm trigger when safely above threshold
                 if (currentY > ModConfig.INSTANCE.yThreshold) {
-                    if (!hasArmed) {
-                        hasArmed = true;
-                    }
+                    hasArmed = true;
                 } 
-                // 2. Trigger disconnect when dropping below threshold
+                // Disconnect when falling below threshold
                 else if (currentY <= ModConfig.INSTANCE.yThreshold && hasArmed) {
                     hasArmed = false;
 
-                    // Force look straight up (-90 pitch) immediately before disconnecting
+                    // Instantly snap player pitch straight up
                     client.player.setPitch(-90.0F);
 
                     triggerRelog(client);
