@@ -18,7 +18,9 @@ public class AutoRelogMod implements ClientModInitializer {
         KeyBinding.Category.create(Identifier.of(MOD_ID, "category"));
 
     public static KeyBinding configKeyBinding;
-    private boolean fellBelowThreshold = false;
+    
+    // Safety flag to prevent log-in loops
+    private boolean hasArmed = false;
 
     @Override
     public void onInitializeClient() {
@@ -31,7 +33,8 @@ public class AutoRelogMod implements ClientModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.player == null || client.world == null) {
-                fellBelowThreshold = false;
+                // Reset state on disconnect so you aren't immediately kicked upon joining
+                hasArmed = false;
                 return;
             }
 
@@ -41,13 +44,15 @@ public class AutoRelogMod implements ClientModInitializer {
 
             if (ModConfig.INSTANCE.enabled) {
                 double currentY = client.player.getY();
-                if (currentY <= ModConfig.INSTANCE.yThreshold) {
-                    if (!fellBelowThreshold) {
-                        fellBelowThreshold = true;
-                        triggerRelog(client);
-                    }
-                } else {
-                    fellBelowThreshold = false;
+
+                // Only arm the trigger once you have been safely above the threshold
+                if (currentY > ModConfig.INSTANCE.yThreshold) {
+                    hasArmed = true;
+                } 
+                // Only disconnect if the trigger was previously armed
+                else if (currentY <= ModConfig.INSTANCE.yThreshold && hasArmed) {
+                    hasArmed = false;
+                    triggerRelog(client);
                 }
             }
         });
@@ -55,7 +60,8 @@ public class AutoRelogMod implements ClientModInitializer {
 
     private void triggerRelog(MinecraftClient client) {
         if (client.getNetworkHandler() != null && client.getNetworkHandler().getConnection() != null) {
-            client.getNetworkHandler().getConnection().disconnect(Text.literal("Auto-Relog Triggered"));
+            client.getNetworkHandler().getConnection().disconnect(Text.literal("Auto-Relog Triggered (Safety Disconnect)"));
         }
     }
 }
+
