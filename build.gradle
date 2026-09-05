@@ -1,6 +1,10 @@
 plugins {
-    id 'fabric-loom' version '1.14-SNAPSHOT'
+    id 'fabric-loom' version '1.14.10'
     id 'maven-publish'
+}
+
+base {
+    archivesName = project.mod_id
 }
 
 version = project.mod_version
@@ -35,6 +39,6 @@ java {
 
 jar {
     from("LICENSE") {
-        rename "${it}_${project.archivesBaseName}"
+        rename "${it}_${base.archivesName.get()}"
     }
 }
