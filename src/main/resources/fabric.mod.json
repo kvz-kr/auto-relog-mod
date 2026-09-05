@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "autorelog",
+  "version": "${version}",
+  "name": "Auto Relog",
+  "description": "Automatically disconnects and reconnects when falling below a configured Y level.",
+  "authors": ["User"],
+  "contact": {},
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.example.autorelog.AutoRelogMod"
+    ]
+  },
+  "mixins": [
+    "autorelog.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
