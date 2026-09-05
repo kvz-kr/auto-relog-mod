@@ -33,6 +33,9 @@ public class AutoRelogMod implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        // Load saved configuration from disk
+        ModConfig.load();
+
         configKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.autorelog.open_config",
             InputUtil.Type.KEYSYM,
@@ -49,7 +52,6 @@ public class AutoRelogMod implements ClientModInitializer {
                     && client.currentScreen instanceof DisconnectedScreen 
                     && lastServer != null) {
                     
-                    // Set delay to 3 ticks (~150ms) to bypass rate limits cleanly
                     if (reconnectTicksRemaining <= 0) {
                         reconnectTicksRemaining = 3; 
                     }
