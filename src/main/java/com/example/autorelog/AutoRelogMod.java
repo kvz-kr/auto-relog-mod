@@ -15,7 +15,7 @@ public class AutoRelogMod implements ClientModInitializer {
     public static final String MOD_ID = "autorelog";
 
     public static final KeyBinding.Category AUTORELOG_CATEGORY = 
-        KeyBinding.Category.register(Identifier.of(MOD_ID, "category"));
+        KeyBinding.Category.create(Identifier.of(MOD_ID, "category"));
 
     public static KeyBinding configKeyBinding;
     private boolean fellBelowThreshold = false;
