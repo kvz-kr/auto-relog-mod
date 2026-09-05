@@ -13,6 +13,7 @@ import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
@@ -39,7 +40,6 @@ public class AutoRelogMod implements ClientModInitializer {
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            // State: Disconnected / Not in world
             if (client.player == null || client.world == null) {
                 hasArmed = false;
 
@@ -49,7 +49,8 @@ public class AutoRelogMod implements ClientModInitializer {
                     && lastServer != null) {
                     
                     ModConfig.INSTANCE.isReconnecting = true;
-                    lookUpTicksRemaining = 10; // Keep pitch forced up for 10 ticks after spawn
+                    ModConfig.INSTANCE.shouldChangeSlotOnJoin = true;
+                    lookUpTicksRemaining = 10;
 
                     ServerInfo targetServer = lastServer;
                     client.execute(() -> {
@@ -59,10 +60,17 @@ public class AutoRelogMod implements ClientModInitializer {
                 return;
             }
 
-            // State: In-game
             ModConfig.INSTANCE.isReconnecting = false;
 
-            // Force pitch to -90 and sync with server for initial spawn ticks
+            // Auto Equip Hotbar Slot & Look Up on Join
+            if (ModConfig.INSTANCE.shouldChangeSlotOnJoin) {
+                client.player.getInventory().selectedSlot = ModConfig.INSTANCE.selectedSlot;
+                if (client.getNetworkHandler() != null) {
+                    client.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(ModConfig.INSTANCE.selectedSlot));
+                }
+                ModConfig.INSTANCE.shouldChangeSlotOnJoin = false;
+            }
+
             if (lookUpTicksRemaining > 0) {
                 client.player.setPitch(-90.0F);
                 client.player.prevPitch = -90.0F;
@@ -80,17 +88,14 @@ public class AutoRelogMod implements ClientModInitializer {
                 lookUpTicksRemaining--;
             }
 
-            // Store active server entry
             if (client.getCurrentServerEntry() != null) {
                 lastServer = client.getCurrentServerEntry();
             }
 
-            // Keybind listener
             while (configKeyBinding.wasPressed()) {
                 client.setScreen(new ConfigScreen(client.currentScreen));
             }
 
-            // Relog Threshold Check
             if (ModConfig.INSTANCE.enabled) {
                 double currentY = client.player.getY();
 
@@ -99,8 +104,6 @@ public class AutoRelogMod implements ClientModInitializer {
                 } 
                 else if (currentY <= ModConfig.INSTANCE.yThreshold && hasArmed) {
                     hasArmed = false;
-                    
-                    // Snap pitch up immediately prior to disconnect packet
                     client.player.setPitch(-90.0F);
                     triggerRelog(client);
                 }
