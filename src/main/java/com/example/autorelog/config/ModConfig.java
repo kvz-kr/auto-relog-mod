@@ -7,5 +7,6 @@ public class ModConfig {
     public double yThreshold = -5.0;
     public boolean autoReconnect = true;
     public boolean isReconnecting = false;
-    public boolean shouldLookUpOnJoin = false;
+    public int selectedSlot = 0; // 0 = Slot 1, 8 = Slot 9
+    public boolean shouldChangeSlotOnJoin = false;
 }
