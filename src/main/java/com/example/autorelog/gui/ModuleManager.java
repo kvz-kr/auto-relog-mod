@@ -9,11 +9,30 @@ public class ModuleManager {
     private final List<AbstractModule> modules = new ArrayList<>();
 
     public ModuleManager() {
-        registerModules();
+        registerDefaultModules();
     }
 
-    private void registerModules() {
-        // Registers custom modules mirroring the Krypton HUD/Utility framework
+    private void registerDefaultModules() {
+        // Combat Modules
+        modules.add(new AbstractModule("Auto Crystal", Module.Category.COMBAT));
+        modules.add(new AbstractModule("Kill Aura", Module.Category.COMBAT));
+        modules.add(new AbstractModule("Triggerbot", Module.Category.COMBAT));
+
+        // Movement Modules
+        modules.add(new AbstractModule("Flight", Module.Category.MOVEMENT));
+        modules.add(new AbstractModule("Sprint", Module.Category.MOVEMENT));
+        modules.add(new AbstractModule("NoFall", Module.Category.MOVEMENT));
+
+        // Render Modules
+        modules.add(new AbstractModule("ESP", Module.Category.RENDER));
+        modules.add(new AbstractModule("Tracers", Module.Category.RENDER));
+        modules.add(new AbstractModule("Fullbright", Module.Category.RENDER));
+
+        // Player Modules
+        modules.add(new AbstractModule("FastEat", Module.Category.PLAYER));
+        modules.add(new AbstractModule("AutoRespawn", Module.Category.PLAYER));
+
+        // Misc Modules (Auto Relog & Auto Reconnect mapped to ModConfig)
         modules.add(new AbstractModule("AUTO LOG", Module.Category.MISC) {
             @Override
             public void onTick() {
