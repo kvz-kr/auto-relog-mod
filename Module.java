@@ -34,10 +34,12 @@ public class Module {
 
     public static List<Module> getAllModules() {
         List<Module> list = new ArrayList<>();
-        for (AbstractModule absMod : ModuleManager.INSTANCE.getModules()) {
-            Module m = new Module(absMod.getName(), absMod.getCategory());
-            m.enabled = absMod.isEnabled();
-            list.add(m);
+        if (ModuleManager.INSTANCE != null) {
+            for (AbstractModule absMod : ModuleManager.INSTANCE.getModules()) {
+                Module m = new Module(absMod.getName(), absMod.getCategory());
+                m.enabled = absMod.isEnabled();
+                list.add(m);
+            }
         }
         return list;
     }
