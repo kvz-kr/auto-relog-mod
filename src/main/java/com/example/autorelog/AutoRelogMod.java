@@ -31,7 +31,7 @@ public class AutoRelogMod implements ClientModInitializer {
             "key.autorelog.open_menu",
             InputUtil.Type.KEYSYM,
             GLFW.GLFW_KEY_RIGHT_SHIFT,
-            KeyBinding.Category.MISC
+            "category.autorelog.title"
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
