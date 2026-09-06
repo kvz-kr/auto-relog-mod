@@ -16,6 +16,13 @@ public class ConfigScreen extends Screen {
         this.parent = parent;
     }
 
+    private void drawOutline(DrawContext context, int x, int y, int width, int height, int color) {
+        context.fill(x, y, x + width, y + 1, color);                  // Top
+        context.fill(x, y + height - 1, x + width, y + height, color); // Bottom
+        context.fill(x, y, x + 1, y + height, color);                  // Left
+        context.fill(x + width - 1, y, x + width, y + height, color);  // Right
+    }
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
@@ -53,7 +60,7 @@ public class ConfigScreen extends Screen {
 
                     // Module Card Box & Outline
                     context.fill(currentX, currentY, currentX + columnWidth, currentY + cardHeight, bgColor);
-                    context.drawBorder(currentX, currentY, columnWidth, cardHeight, outlineColor);
+                    drawOutline(context, currentX, currentY, columnWidth, cardHeight, outlineColor);
 
                     // Module Label
                     context.drawTextWithShadow(this.textRenderer, mod.getName(), currentX + 8, currentY + 7, textColor);
