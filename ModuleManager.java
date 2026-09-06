@@ -1,8 +1,12 @@
 package com.example.autorelog.gui;
 
 import com.example.autorelog.modules.combat.AutoTotemModule;
+import com.example.autorelog.modules.combat.NoHitDelayModule;
+import com.example.autorelog.modules.combat.TriggerBotModule;
+import com.example.autorelog.modules.misc.FastPlaceModule;
 import com.example.autorelog.modules.misc.SprintModule;
 import com.example.autorelog.modules.render.FullbrightModule;
+import com.example.autorelog.modules.render.PlayerESPModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +16,18 @@ public class ModuleManager {
     private final List<AbstractModule> modules = new ArrayList<>();
 
     public ModuleManager() {
-        // Register core working modules
-        register(new SprintModule());
-        register(new FullbrightModule());
+        // Combat
         register(new AutoTotemModule());
+        register(new TriggerBotModule());
+        register(new NoHitDelayModule());
+
+        // Misc
+        register(new SprintModule());
+        register(new FastPlaceModule());
+
+        // Render
+        register(new FullbrightModule());
+        register(new PlayerESPModule());
     }
 
     private void register(AbstractModule module) {
