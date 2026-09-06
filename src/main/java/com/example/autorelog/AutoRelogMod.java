@@ -1,3 +1,16 @@
+package com.example.autorelog;
+
+import com.example.autorelog.gui.ConfigScreen;
+import com.example.autorelog.gui.ModuleManager; // Add this line
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.gui.screen.DisconnectedScreen;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
+import net.minecraft.client.network.ServerAddress;
+import net.minecraft.client.network.ServerInfo;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 ClientTickEvents.END_CLIENT_TICK.register(client -> {
     // Executes logic for all enabled client modules
     ModuleManager.INSTANCE.onTick();
