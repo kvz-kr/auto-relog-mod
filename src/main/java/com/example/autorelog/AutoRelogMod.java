@@ -14,6 +14,7 @@ import net.minecraft.client.network.ServerAddress;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
+import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public class AutoRelogMod implements ClientModInitializer {
@@ -31,7 +32,7 @@ public class AutoRelogMod implements ClientModInitializer {
             "key.autorelog.open_menu",
             InputUtil.Type.KEYSYM,
             GLFW.GLFW_KEY_RIGHT_SHIFT,
-            "category.autorelog.title"
+            KeyBinding.Category.create(Identifier.of("autorelog", "title"))
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
