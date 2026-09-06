@@ -1,15 +1,10 @@
 package com.example.autorelog.gui;
 
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.HashSet;
@@ -19,11 +14,11 @@ public class SusChunkFinderModule extends AbstractModule {
     public static final SusChunkFinderModule INSTANCE = new SusChunkFinderModule();
 
     public int simulationDistance = 4;
-    public int sensitivity = 4; // Minimum count of grown target blocks to flag a chunk
+    public int sensitivity = 4;
     public boolean smartAdjustment = true;
     public int alpha = 30;
 
-    // Target block toggles
+    // Block toggles
     public boolean kelp = false;
     public boolean caveVines = false;
     public boolean vines = false;
@@ -37,7 +32,6 @@ public class SusChunkFinderModule extends AbstractModule {
 
     public SusChunkFinderModule() {
         super("SUS CHUNK FINDER", Module.Category.RENDER);
-        WorldRenderEvents.AFTER_TRANSLUCENT.register(this::onRenderWorld);
     }
 
     @Override
@@ -78,7 +72,7 @@ public class SusChunkFinderModule extends AbstractModule {
 
         for (int x = minX; x < minX + 16; x++) {
             for (int z = minZ; z < minZ + 16; z++) {
-                for (int y = minY; y <= maxY; y++) {
+                for (int y = minY; y <= maxY; y += 2) { // Optimized Y-step scan
                     BlockPos pos = new BlockPos(x, y, z);
                     Block block = world.getBlockState(pos).getBlock();
 
@@ -96,38 +90,7 @@ public class SusChunkFinderModule extends AbstractModule {
         return count;
     }
 
-    private void onRenderWorld(WorldRenderContext context) {
-        if (!isEnabled() || suspiciousChunks.isEmpty()) return;
-
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null) return;
-
-        Vec3d cameraPos = context.camera().getPos();
-        MatrixStack matrices = context.matrixStack();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-
-        matrices.push();
-        matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-
-        float r = 1.0f, g = 0.2f, b = 0.2f, a = Math.max(0.05f, alpha / 100.0f);
-
-        for (ChunkPos chunk : suspiciousChunks) {
-            double x1 = chunk.getStartX();
-            double z1 = chunk.getStartZ();
-            double x2 = chunk.getEndX() + 1;
-            double z2 = chunk.getEndZ() + 1;
-            double y1 = client.world.getBottomY();
-            double y2 = client.world.getTopYInclusive() + 1;
-
-            // Highlight chunk bounding quad
-            buffer.vertex(matrices.peek().getPositionMatrix(), (float)x1, (float)y1, (float)z1).color(r, g, b, a);
-            buffer.vertex(matrices.peek().getPositionMatrix(), (float)x2, (float)y1, (float)z1).color(r, g, b, a);
-            buffer.vertex(matrices.peek().getPositionMatrix(), (float)x2, (float)y1, (float)z2).color(r, g, b, a);
-            buffer.vertex(matrices.peek().getPositionMatrix(), (float)x1, (float)y1, (float)z2).color(r, g, b, a);
-        }
-
-        BufferRenderer.drawWithGlobalProgram(buffer.end());
-        matrices.pop();
+    public Set<ChunkPos> getSuspiciousChunks() {
+        return suspiciousChunks;
     }
 }
