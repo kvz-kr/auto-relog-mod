@@ -59,6 +59,7 @@ public class ConfigScreen extends Screen {
         }
     }
 
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0) {
             Module.Category[] categories = Module.Category.values();
@@ -100,7 +101,7 @@ public class ConfigScreen extends Screen {
                 }
             }
         }
-        return false;
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
