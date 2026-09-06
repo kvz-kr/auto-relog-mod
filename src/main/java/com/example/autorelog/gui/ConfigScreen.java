@@ -15,6 +15,8 @@ public class ConfigScreen extends Screen {
 
     @Override
     protected void init() {
+        int startY = this.height / 2 - 60;
+
         // Toggle Enabled
         this.addDrawableChild(ButtonWidget.builder(
             Text.literal("Enabled: " + ModConfig.INSTANCE.enabled),
@@ -23,7 +25,7 @@ public class ConfigScreen extends Screen {
                 button.setMessage(Text.literal("Enabled: " + ModConfig.INSTANCE.enabled));
                 ModConfig.save();
             })
-            .dimensions(this.width / 2 - 100, this.height / 2 - 45, 200, 20)
+            .dimensions(this.width / 2 - 100, startY, 200, 20)
             .build()
         );
 
@@ -35,7 +37,19 @@ public class ConfigScreen extends Screen {
                 button.setMessage(Text.literal("Auto Equip Slot: " + (ModConfig.INSTANCE.selectedSlot + 1)));
                 ModConfig.save();
             })
-            .dimensions(this.width / 2 - 100, this.height / 2 - 15, 200, 20)
+            .dimensions(this.width / 2 - 100, startY + 25, 200, 20)
+            .build()
+        );
+
+        // Reconnect Speed / Delay Selector (1 - 20 Ticks)
+        this.addDrawableChild(ButtonWidget.builder(
+            Text.literal("Reconnect Delay: " + ModConfig.INSTANCE.reconnectDelayTicks + " Ticks (" + (ModConfig.INSTANCE.reconnectDelayTicks * 50) + "ms)"),
+            button -> {
+                ModConfig.INSTANCE.reconnectDelayTicks = (ModConfig.INSTANCE.reconnectDelayTicks % 20) + 1;
+                button.setMessage(Text.literal("Reconnect Delay: " + ModConfig.INSTANCE.reconnectDelayTicks + " Ticks (" + (ModConfig.INSTANCE.reconnectDelayTicks * 50) + "ms)"));
+                ModConfig.save();
+            })
+            .dimensions(this.width / 2 - 100, startY + 50, 200, 20)
             .build()
         );
 
@@ -46,7 +60,7 @@ public class ConfigScreen extends Screen {
                 ModConfig.save();
                 this.client.setScreen(this.parent);
             })
-            .dimensions(this.width / 2 - 100, this.height / 2 + 25, 200, 20)
+            .dimensions(this.width / 2 - 100, startY + 85, 200, 20)
             .build()
         );
     }
