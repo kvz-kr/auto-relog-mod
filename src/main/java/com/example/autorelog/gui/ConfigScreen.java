@@ -1,6 +1,7 @@
 package com.example.autorelog.gui;
 
 import com.example.autorelog.ModConfig;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -60,8 +61,10 @@ public class ConfigScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == 0) {
+    public boolean mouseClicked(Click click, boolean doubled) {
+        if (click.button() == 0) {
+            double mouseX = click.x();
+            double mouseY = click.y();
             Module.Category[] categories = Module.Category.values();
             int startX = 20;
             int startY = 40;
@@ -101,7 +104,7 @@ public class ConfigScreen extends Screen {
                 }
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override
