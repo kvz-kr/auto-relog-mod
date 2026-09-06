@@ -27,12 +27,12 @@ public class AutoRelogMod implements ClientModInitializer {
     public void onInitializeClient() {
         ModConfig.load();
 
-        configKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-            "key.autorelog.open_menu",
-            InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_RIGHT_SHIFT,
-            "category.autorelog.title"
-        ));
+  configKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+    "key.autorelog.open_menu",
+    InputUtil.Type.KEYSYM,
+    GLFW.GLFW_KEY_RIGHT_SHIFT,
+    KeyBinding.MISC_CATEGORY // Standard Fabric keybinding category string
+));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             // Tick all registered modules
