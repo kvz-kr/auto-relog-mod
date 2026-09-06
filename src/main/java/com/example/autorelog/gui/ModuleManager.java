@@ -13,34 +13,41 @@ public class ModuleManager {
     }
 
     private void registerDefaultModules() {
+        // Concrete module implementation class for generic modules
+        class GenericModule extends AbstractModule {
+            public GenericModule(String name, Module.Category category) {
+                super(name, category);
+            }
+        }
+
         // Combat Modules
-        modules.add(new AbstractModule("Auto Crystal", Module.Category.COMBAT));
-        modules.add(new AbstractModule("Kill Aura", Module.Category.COMBAT));
-        modules.add(new AbstractModule("Triggerbot", Module.Category.COMBAT));
+        modules.add(new GenericModule("Auto Crystal", Module.Category.COMBAT));
+        modules.add(new GenericModule("Kill Aura", Module.Category.COMBAT));
+        modules.add(new GenericModule("Triggerbot", Module.Category.COMBAT));
 
         // Movement Modules
-        modules.add(new AbstractModule("Flight", Module.Category.MOVEMENT));
-        modules.add(new AbstractModule("Sprint", Module.Category.MOVEMENT));
-        modules.add(new AbstractModule("NoFall", Module.Category.MOVEMENT));
+        modules.add(new GenericModule("Flight", Module.Category.MOVEMENT));
+        modules.add(new GenericModule("Sprint", Module.Category.MOVEMENT));
+        modules.add(new GenericModule("NoFall", Module.Category.MOVEMENT));
 
         // Render Modules
-        modules.add(new AbstractModule("ESP", Module.Category.RENDER));
-        modules.add(new AbstractModule("Tracers", Module.Category.RENDER));
-        modules.add(new AbstractModule("Fullbright", Module.Category.RENDER));
+        modules.add(new GenericModule("ESP", Module.Category.RENDER));
+        modules.add(new GenericModule("Tracers", Module.Category.RENDER));
+        modules.add(new GenericModule("Fullbright", Module.Category.RENDER));
 
         // Player Modules
-        modules.add(new AbstractModule("FastEat", Module.Category.PLAYER));
-        modules.add(new AbstractModule("AutoRespawn", Module.Category.PLAYER));
+        modules.add(new GenericModule("FastEat", Module.Category.PLAYER));
+        modules.add(new GenericModule("AutoRespawn", Module.Category.PLAYER));
 
         // Misc Modules (Auto Relog & Auto Reconnect mapped to ModConfig)
-        modules.add(new AbstractModule("AUTO LOG", Module.Category.MISC) {
+        modules.add(new GenericModule("AUTO LOG", Module.Category.MISC) {
             @Override
             public void onTick() {
                 ModConfig.INSTANCE.enabled = this.isEnabled();
             }
         });
 
-        modules.add(new AbstractModule("AUTO RECONNECT", Module.Category.MISC) {
+        modules.add(new GenericModule("AUTO RECONNECT", Module.Category.MISC) {
             @Override
             public void onTick() {
                 ModConfig.INSTANCE.autoReconnect = this.isEnabled();
