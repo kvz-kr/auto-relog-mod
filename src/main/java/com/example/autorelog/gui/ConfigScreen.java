@@ -1,14 +1,12 @@
 package com.example.autorelog.gui;
 
 import com.example.autorelog.ModConfig;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ConfigScreen extends Screen {
     private final Screen parent;
@@ -38,7 +36,7 @@ public class ConfigScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context, mouseX, mouseY, delta);
+        this.renderBackground(context);
         int centerX = this.width / 2;
         int centerY = this.height / 2;
 
@@ -83,7 +81,7 @@ public class ConfigScreen extends Screen {
 
         // Draw Right-Click Dropdown Context Menu
         if (contextMenuOpen) {
-            renderContextMenu(context, mouseX, mouseY);
+            renderContextMenu(context);
         }
 
         super.render(context, mouseX, mouseY, delta);
@@ -98,7 +96,7 @@ public class ConfigScreen extends Screen {
         context.drawTextWithShadow(this.textRenderer, value, x + 130, y + 6, ModConfig.INSTANCE.accentColor);
     }
 
-    private void renderContextMenu(DrawContext context, int mouseX, int mouseY) {
+    private void renderContextMenu(DrawContext context) {
         int width = 100;
         int height = 50;
 
@@ -117,7 +115,11 @@ public class ConfigScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(Click click, boolean released) {
+        double mouseX = click.x();
+        double mouseY = click.y();
+        int button = click.button();
+
         int centerX = this.width / 2;
         int centerY = this.height / 2;
 
@@ -156,7 +158,7 @@ public class ConfigScreen extends Screen {
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(click, released);
     }
 
     private void openContextMenu(String type, int x, int y) {
