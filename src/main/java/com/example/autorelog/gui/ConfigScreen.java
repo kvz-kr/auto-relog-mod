@@ -116,9 +116,14 @@ public class ConfigScreen extends Screen {
                         continue;
                     }
 
-                    if (mouseX >= currentX && mouseX <= currentX + columnWidth && mouseY >= currentY && mouseY <= currentY + 12) {
-                        if (button == 0) { // Left Click Toggle
-                            mod.enabled = !mod.enabled;
+                   // Toggle local GUI state and backend execution module
+mod.enabled = !mod.enabled;
+for (AbstractModule absMod : ModuleManager.INSTANCE.getModules()) {
+    if (absMod.getName().equalsIgnoreCase(mod.name)) {
+        absMod.setEnabled(mod.enabled);
+        break;
+    }
+}
                             
                             // Link Auto Relog module to your configuration
                             if (mod.name.equals("AUTO LOG") || mod.name.equals("AUTO RECONNECT")) {
