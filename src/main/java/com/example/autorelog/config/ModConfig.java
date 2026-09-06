@@ -15,14 +15,18 @@ public class ModConfig {
 
     public static ModConfig INSTANCE = new ModConfig();
 
-    // Persistent Settings
+    // Features
     public boolean enabled = true;
     public double yThreshold = -5.0;
     public boolean autoReconnect = true;
     public int selectedSlot = 0;
-    public int reconnectDelayTicks = 3; // Default 3 ticks (~150ms)
+    public int reconnectDelayTicks = 3;
 
-    // Session Runtime Flags
+    // GUI Customization
+    public String theme = "LUNAR"; // "STAR", "LUNAR", "ECLIPSE"
+    public int accentColor = 0xFF3B82F6; // Default Hex ARGB
+
+    // Session Flags
     public transient boolean isReconnecting = false;
     public transient boolean shouldChangeSlotOnJoin = false;
 
