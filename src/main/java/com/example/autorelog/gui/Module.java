@@ -1,13 +1,6 @@
 package com.example.autorelog.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Module {
-    public String name;
-    public Category category;
-    public boolean enabled;
-
     public enum Category {
         COMBAT("Combat"),
         MOVEMENT("Movement"),
@@ -24,23 +17,5 @@ public class Module {
         public String getDisplayName() {
             return displayName;
         }
-    }
-
-    public Module(String name, Category category) {
-        this.name = name;
-        this.category = category;
-        this.enabled = false;
-    }
-
-    public static List<Module> getAllModules() {
-        List<Module> list = new ArrayList<>();
-        if (ModuleManager.INSTANCE != null) {
-            for (AbstractModule absMod : ModuleManager.INSTANCE.getModules()) {
-                Module m = new Module(absMod.getName(), absMod.getCategory());
-                m.enabled = absMod.isEnabled();
-                list.add(m);
-            }
-        }
-        return list;
     }
 }
