@@ -93,10 +93,6 @@ public class ConfigScreen extends Screen {
                                     break;
                                 }
                             }
-
-                            if (mod.name.equals("AUTO LOG") || mod.name.equals("AUTO RECONNECT")) {
-                                ModConfig.INSTANCE.enabled = mod.enabled;
-                            }
                             return true;
                         }
                         currentY += cardHeight + 5;
