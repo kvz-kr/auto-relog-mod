@@ -33,7 +33,6 @@ public class AutoRelogMod implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        // Load saved configuration from disk
         ModConfig.load();
 
         configKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
@@ -52,8 +51,9 @@ public class AutoRelogMod implements ClientModInitializer {
                     && client.currentScreen instanceof DisconnectedScreen 
                     && lastServer != null) {
                     
+                    // Initialize delay using the dynamic config value
                     if (reconnectTicksRemaining <= 0) {
-                        reconnectTicksRemaining = 3; 
+                        reconnectTicksRemaining = ModConfig.INSTANCE.reconnectDelayTicks; 
                     }
 
                     if (reconnectTicksRemaining > 0) {
