@@ -10,11 +10,9 @@ import java.util.List;
 
 public class ConfigScreen extends Screen {
     private final Screen parent;
-    private static final List<Module> MODULES = Module.getAllModules();
-    private String searchFilter = "";
 
     public ConfigScreen(Screen parent) {
-        super(Text.literal("Auto-Relog Configuration"));
+        super(Text.literal("Krypton Client"));
         this.parent = parent;
     }
 
@@ -22,39 +20,49 @@ public class ConfigScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 15, 0xFFFFFFFF);
+        // Header Title
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("KRYPTON MENU"), this.width / 2, 15, 0xFF55FF55);
 
         Module.Category[] categories = Module.Category.values();
+        List<AbstractModule> allModules = ModuleManager.INSTANCE.getModules();
+
+        int columnWidth = 110;
+        int cardHeight = 22;
+        int gapX = 12;
         int startX = 20;
-        int startY = 40;
-        int cardWidth = 120;
-        int cardHeight = 25;
-        int gap = 10;
 
-        for (int i = 0; i < categories.length; i++) {
-            Module.Category cat = categories[i];
-            int currentX = startX + (i % 3) * (cardWidth + gap);
-            int currentY = startY + (i / 3) * 160;
+        for (int c = 0; c < categories.length; c++) {
+            Module.Category cat = categories[c];
+            int currentX = startX + c * (columnWidth + gapX);
+            int currentY = 40;
 
-            context.drawTextWithShadow(this.textRenderer, cat.getDisplayName(), currentX, currentY, 0xFFFFAA00);
-            currentY += 15;
+            // Category Header Box
+            context.fill(currentX, currentY, currentX + columnWidth, currentY + 18, 0xFF151515);
+            context.drawCenteredTextWithShadow(this.textRenderer, cat.getDisplayName().toUpperCase(), currentX + (columnWidth / 2), currentY + 5, 0xFF00FFCC);
 
-            for (Module mod : MODULES) {
-                if (mod.category == cat) {
-                    if (!searchFilter.isEmpty() && !mod.name.toLowerCase().contains(searchFilter.toLowerCase())) {
-                        continue;
-                    }
+            currentY += 22;
 
-                    int bgColor = mod.enabled ? 0x8000FF00 : 0x80000000;
-                    context.fill(currentX, currentY, currentX + cardWidth, currentY + cardHeight, bgColor);
+            // Render Modules under this category
+            for (AbstractModule mod : allModules) {
+                if (mod.getCategory() == cat) {
+                    boolean enabled = mod.isEnabled();
 
-                    int textColor = mod.enabled ? 0xFFFFFFFF : 0xFF888888;
-                    context.drawTextWithShadow(this.textRenderer, mod.name, currentX + 5, currentY + 2, textColor);
+                    int bgColor = enabled ? 0xFF1E3A1E : 0xFF1E1E1E;
+                    int outlineColor = enabled ? 0xFF55FF55 : 0xFF333333;
+                    int textColor = enabled ? 0xFFFFFFFF : 0xFFAAAAAA;
 
-                    int dotColor = mod.enabled ? ModConfig.INSTANCE.accentColor : 0xFF555555;
-                    context.fill(currentX + cardWidth - 10, currentY + 10, currentX + cardWidth - 4, currentY + 16, dotColor);
+                    // Module Card Box & Outline
+                    context.fill(currentX, currentY, currentX + columnWidth, currentY + cardHeight, bgColor);
+                    context.drawBorder(currentX, currentY, columnWidth, cardHeight, outlineColor);
 
-                    currentY += cardHeight + 5;
+                    // Module Label
+                    context.drawTextWithShadow(this.textRenderer, mod.getName(), currentX + 8, currentY + 7, textColor);
+
+                    // Indicator Box
+                    int indicatorColor = enabled ? 0xFF55FF55 : 0xFF555555;
+                    context.fill(currentX + columnWidth - 14, currentY + 7, currentX + columnWidth - 6, currentY + 15, indicatorColor);
+
+                    currentY += cardHeight + 4;
                 }
             }
         }
@@ -65,37 +73,29 @@ public class ConfigScreen extends Screen {
         if (click.button() == 0) {
             double mouseX = click.x();
             double mouseY = click.y();
+
             Module.Category[] categories = Module.Category.values();
+            List<AbstractModule> allModules = ModuleManager.INSTANCE.getModules();
+
+            int columnWidth = 110;
+            int cardHeight = 22;
+            int gapX = 12;
             int startX = 20;
-            int startY = 40;
-            int cardWidth = 120;
-            int cardHeight = 25;
-            int gap = 10;
 
-            for (int i = 0; i < categories.length; i++) {
-                Module.Category cat = categories[i];
-                int currentX = startX + (i % 3) * (cardWidth + gap);
-                int currentY = startY + (i / 3) * 160 + 15;
+            for (int c = 0; c < categories.length; c++) {
+                Module.Category cat = categories[c];
+                int currentX = startX + c * (columnWidth + gapX);
+                int currentY = 62;
 
-                for (Module mod : MODULES) {
-                    if (mod.category == cat) {
-                        if (!searchFilter.isEmpty() && !mod.name.toLowerCase().contains(searchFilter.toLowerCase())) {
-                            continue;
-                        }
-
-                        if (mouseX >= currentX && mouseX <= currentX + cardWidth &&
+                for (AbstractModule mod : allModules) {
+                    if (mod.getCategory() == cat) {
+                        if (mouseX >= currentX && mouseX <= currentX + columnWidth &&
                             mouseY >= currentY && mouseY <= currentY + cardHeight) {
                             
-                            mod.enabled = !mod.enabled;
-                            for (AbstractModule absMod : ModuleManager.INSTANCE.getModules()) {
-                                if (absMod.getName().equalsIgnoreCase(mod.name)) {
-                                    absMod.setEnabled(mod.enabled);
-                                    break;
-                                }
-                            }
+                            mod.toggle();
                             return true;
                         }
-                        currentY += cardHeight + 5;
+                        currentY += cardHeight + 4;
                     }
                 }
             }
