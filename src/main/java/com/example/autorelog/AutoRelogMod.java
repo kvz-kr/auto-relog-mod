@@ -51,7 +51,6 @@ public class AutoRelogMod implements ClientModInitializer {
                     && client.currentScreen instanceof DisconnectedScreen 
                     && lastServer != null) {
                     
-                    // Initialize delay using the dynamic config value
                     if (reconnectTicksRemaining <= 0) {
                         reconnectTicksRemaining = ModConfig.INSTANCE.reconnectDelayTicks; 
                     }
@@ -117,10 +116,12 @@ public class AutoRelogMod implements ClientModInitializer {
             if (ModConfig.INSTANCE.enabled) {
                 double currentY = client.player.getY();
 
-                if (currentY > ModConfig.INSTANCE.yThreshold) {
+                // Requires you to climb 2 blocks ABOVE the threshold before re-arming
+                if (currentY > (ModConfig.INSTANCE.yThreshold + 2.0)) {
                     hasArmed = true;
                 } 
-                else if (currentY <= ModConfig.INSTANCE.yThreshold && hasArmed) {
+                // Only triggers if explicitly below threshold AND was previously armed
+                else if (currentY < ModConfig.INSTANCE.yThreshold && hasArmed) {
                     hasArmed = false;
                     client.player.setPitch(-90.0F);
                     triggerRelog(client);
