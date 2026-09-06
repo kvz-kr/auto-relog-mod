@@ -20,8 +20,9 @@ public class ModConfig {
     public double yThreshold = -5.0;
     public boolean autoReconnect = true;
     public int selectedSlot = 0;
+    public int reconnectDelayTicks = 3; // Default 3 ticks (~150ms)
 
-    // Session Runtime Flags (Do Not Save)
+    // Session Runtime Flags
     public transient boolean isReconnecting = false;
     public transient boolean shouldChangeSlotOnJoin = false;
 
@@ -33,7 +34,7 @@ public class ModConfig {
                 e.printStackTrace();
             }
         } else {
-            save(); // Save default values if config file doesn't exist yet
+            save();
         }
     }
 
